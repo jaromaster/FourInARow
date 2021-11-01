@@ -10,15 +10,18 @@ export const getSelectedCol = (colBounds, mouseX) => {
     return -1
 }
 
-// paints selected column
+// paints colored rectangle to highlight the selected column
 // takes an array rgb with all rgb values [R, G, B, A] (A can be omitted)
 export const highlightColRGB = (col, colBounds, y, circleRad, p5, rgb) => {
     const x = colBounds[col][0];
     const width = circleRad;
     const height = 6 * width;
 
-    p5.fill(rgb[0], rgb[1], rgb[2], rgb.length === 4 ? rgb[3] : 255);
+    p5.noFill();
+    p5.stroke(rgb[0], rgb[1], rgb[2], rgb.length === 4 ? rgb[3] : 255);
+    p5.strokeWeight(4);
     p5.rect(x, y-circleRad/2, width, height);
+    p5.strokeWeight(1);
 }
 
 // insert new player-stone into game field
@@ -61,7 +64,6 @@ export const checkWin = (field) => {
             }
             // won
             if (cursInDiag >= 4 && cur !== ""){
-                console.log(diagonals[i])
                 return cur;
             }
         }
@@ -102,7 +104,6 @@ export const checkWin = (field) => {
             }
         }
     }
-
     return "";
 }
 
@@ -155,6 +156,14 @@ const getFieldDiagonals = (field) => {
         }
         diagonals.push(diagonal);
     }
-
     return diagonals;
+}
+
+// return random char: "r" or "b" (red and blue)
+export const generateRandomTurn = () => {
+    if (Math.random() < 0.5){ // 50 % chance
+        return "b";
+    }else{
+        return "r";
+    }
 }

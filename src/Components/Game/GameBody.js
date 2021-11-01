@@ -1,6 +1,6 @@
 import Sketch from 'react-p5'
 import React from 'react'
-import { addToField, checkWin, getSelectedCol, highlightColRGB } from '../../GameLogic/GameLogic';
+import { addToField, checkWin, generateRandomTurn, getSelectedCol, highlightColRGB } from '../../GameLogic/GameLogic';
 import './GameBody.css';
 
 const GameBody = () => {
@@ -14,17 +14,8 @@ const GameBody = () => {
         ["", "", "", "", "", "", ""]
     ]
     let winner = ""; // empty string means no winner yet
-    
-    let currentTurn = ""; // which player is next
-    if (Math.random() < 0.5){ // 50 % chance
-        currentTurn = "b"
-    }else{
-        currentTurn = "r"
-    }
+    let currentTurn = generateRandomTurn(); // which player is next, random player starts
     let hasClicked = false; // if player clicked a short time ago, only accept new clicks if hasClicked is false
-
-
-
 
     // setup p5
     const setup = (p5, canvasParentRef) => {
@@ -43,10 +34,11 @@ const GameBody = () => {
         let x = xStart;
         let y = yStart;
 
+        p5.noFill();
+        p5.stroke(0);
+        p5.strokeWeight(2);
         for (let i = 0; i < field.length; i++) {
             for (let j = 0; j < field[i].length; j++) {
-                p5.noFill();
-                p5.stroke("black");
                 p5.rect(x-circleRad/2, y-circleRad/2, circleRad, circleRad);
                 x += circleRad;
             }
@@ -60,6 +52,7 @@ const GameBody = () => {
         let x = xStart;
         let y = yStart;
 
+        p5.noStroke();
         for (let i = 0; i < field.length; i++) {
             for (let j = 0; j < field[i].length; j++) {
                 // position is empty, no stone is drawn
@@ -67,13 +60,12 @@ const GameBody = () => {
                     x += circleRad;
                     continue;
                 }
-                if (field[i][j] === "r") {
+                else if (field[i][j] === "r") {
                     p5.fill("red");
                 }
                 else if (field[i][j] === "b"){
                     p5.fill("blue");
                 }
-                p5.noStroke();
                 p5.circle(x, y, circleRad);
                 x += circleRad;
             }
@@ -86,7 +78,7 @@ const GameBody = () => {
     const drawWinningText = (xStart, yStart, circleRad, fontSize, winner, p5) => {
         const winText = winner === "r" ? "Red has won!" : "Blue has won!";
         const winTextX = xStart + 4.5 * circleRad - p5.textWidth(winText); // center text horizontally
-        const winTextY = yStart / 2 - fontSize / 2; // center text vertically
+        const winTextY = (yStart - fontSize) / 2; // center text vertically
         if (winner === "r"){
             p5.fill("red");
         }else{
@@ -127,12 +119,21 @@ const GameBody = () => {
         ]
         const selectedCol = getSelectedCol(colBounds, p5.mouseX);
 
-        // highlighting could be optimized, as it is sometimes laggy
+
+        // draw stones and the grid
+        drawStones(field, xStart, yStart, circleRad, p5);
+        drawGrid(field, xStart, yStart, circleRad, p5);
+        // draw text if player has won
+        if (winner !== "") {
+            drawWinningText(xStart, yStart, circleRad, 30, winner, p5);
+        }
+
         if (selectedCol !== -1){
+            // highlight selected column
             if (currentTurn === "r"){
-                highlightColRGB(selectedCol, colBounds, yStart, circleRad, p5, [255, 10, 10, 100])
+                highlightColRGB(selectedCol, colBounds, yStart, circleRad, p5, [255, 0, 0]);
             }else{
-                highlightColRGB(selectedCol, colBounds, yStart, circleRad, p5, [10, 10, 255, 100])
+                highlightColRGB(selectedCol, colBounds, yStart, circleRad, p5, [10, 10, 255]);
             }
             
             if (p5.mouseIsPressed && !hasClicked) { // check if user clicked column and is allowed to click again
@@ -147,7 +148,8 @@ const GameBody = () => {
                         ["", "", "", "", "", "", ""]
                     ]
                     winner = "";
-                    
+                    currentTurn = generateRandomTurn();
+
                 }
                 else if (addToField(field, selectedCol, currentTurn)){
                     if (currentTurn === "b"){
@@ -164,19 +166,9 @@ const GameBody = () => {
                 hasClicked = true;
                 setTimeout(()=> {
                     hasClicked = false;
-                }, 300);
+                }, 250);
             }
         }
-
-        // draw text if player has won
-        if (winner !== "") {
-            drawWinningText(xStart,yStart, circleRad, 30, winner, p5);
-        }
-        p5.noFill();
-
-        // draw stones and the grid
-        drawStones(field, xStart, yStart, circleRad, p5);
-        drawGrid(field, xStart, yStart, circleRad, p5);
     }
 
     return (
