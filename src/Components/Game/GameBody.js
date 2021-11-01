@@ -1,10 +1,9 @@
 import Sketch from 'react-p5'
-import React, { useState} from 'react'
-import { addToField, checkWin, getSelectedCol, highlightCol, highlightColRGB } from '../../GameLogic/GameLogic';
+import React from 'react'
+import { addToField, checkWin, getSelectedCol, highlightColRGB } from '../../GameLogic/GameLogic';
 import './GameBody.css';
 
 const GameBody = () => {
-
     // game field, width = 7, height = 6, red or blue: "r" / "b"
     let field = [
         ["", "", "", "", "", "", ""],
@@ -24,14 +23,79 @@ const GameBody = () => {
     }
     let hasClicked = false; // if player clicked a short time ago, only accept new clicks if hasClicked is false
 
+
+
+
     // setup p5
     const setup = (p5, canvasParentRef) => {
         // friendly errors are not check -> better performance
         p5.disableFriendlyErrors = true;
+
         // get width and height of div gameBody
         const divWidth = document.getElementById("gameBody").offsetWidth - 2;
         const divHeight = document.getElementById("gameBody").offsetHeight;
         p5.createCanvas(divWidth, divHeight).parent(canvasParentRef);
+        p5.frameRate(35);
+    }
+
+    // draw grid
+    const drawGrid = (field, xStart, yStart, circleRad, p5) => {
+        let x = xStart;
+        let y = yStart;
+
+        for (let i = 0; i < field.length; i++) {
+            for (let j = 0; j < field[i].length; j++) {
+                p5.noFill();
+                p5.stroke("black");
+                p5.rect(x-circleRad/2, y-circleRad/2, circleRad, circleRad);
+                x += circleRad;
+            }
+            x = xStart;
+            y += circleRad;
+        }
+    }
+
+    // draw stones
+    const drawStones = (field, xStart, yStart, circleRad, p5) => {
+        let x = xStart;
+        let y = yStart;
+
+        for (let i = 0; i < field.length; i++) {
+            for (let j = 0; j < field[i].length; j++) {
+                // position is empty, no stone is drawn
+                if (field[i][j] === ""){
+                    x += circleRad;
+                    continue;
+                }
+                if (field[i][j] === "r") {
+                    p5.fill("red");
+                }
+                else if (field[i][j] === "b"){
+                    p5.fill("blue");
+                }
+                p5.noStroke();
+                p5.circle(x, y, circleRad);
+                x += circleRad;
+            }
+            x = xStart;
+            y += circleRad;
+        }
+    }
+
+    // draw text
+    const drawWinningText = (xStart, yStart, circleRad, fontSize, winner, p5) => {
+        const winText = winner === "r" ? "Red has won!" : "Blue has won!";
+        const winTextX = xStart + 4.5 * circleRad - p5.textWidth(winText); // center text horizontally
+        const winTextY = yStart / 2 - fontSize / 2; // center text vertically
+        if (winner === "r"){
+            p5.fill("red");
+        }else{
+            p5.fill("blue");
+        }
+        p5.noStroke();
+        p5.textSize(fontSize);
+        p5.textStyle(p5.BOLD);
+        p5.text(winText, winTextX, winTextY); // draw text
     }
 
     // draws field
@@ -43,14 +107,11 @@ const GameBody = () => {
         const circleRad = 80;
         const xStep = circleRad;
         const yStep = circleRad;
-        
 
         // xStart: starting value of x, used for centering horizontally
         const xStart = (divWidth - field[0].length * xStep) / 2 + circleRad / 2
-        let x = xStart
         // yStart: starting value of y, used for centering vertically
-        let y = (divHeight - field.length * yStep) / 2 + circleRad / 2
-
+        const yStart = (divHeight - field.length * yStep) / 2 + circleRad / 2
 
         // cols defines bound of the single columns
         // used for user input (check which column was clicked)
@@ -69,9 +130,9 @@ const GameBody = () => {
         // highlighting could be optimized, as it is sometimes laggy
         if (selectedCol !== -1){
             if (currentTurn === "r"){
-                highlightColRGB(selectedCol, colBounds, y, circleRad, p5, [255, 10, 10, 100])
+                highlightColRGB(selectedCol, colBounds, yStart, circleRad, p5, [255, 10, 10, 100])
             }else{
-                highlightColRGB(selectedCol, colBounds, y, circleRad, p5, [10, 10, 255, 100])
+                highlightColRGB(selectedCol, colBounds, yStart, circleRad, p5, [10, 10, 255, 100])
             }
             
             if (p5.mouseIsPressed && !hasClicked) { // check if user clicked column and is allowed to click again
@@ -86,6 +147,7 @@ const GameBody = () => {
                         ["", "", "", "", "", "", ""]
                     ]
                     winner = "";
+                    
                 }
                 else if (addToField(field, selectedCol, currentTurn)){
                     if (currentTurn === "b"){
@@ -108,43 +170,14 @@ const GameBody = () => {
 
         // draw text if player has won
         if (winner !== "") {
-            const winText = winner === "r" ? "Red has won!" : "Blue has won!";
-            const fontSize = 30;
-            const winTextX = xStart + 4.5 * circleRad - p5.textWidth(winText); // center text horizontally
-            const winTextY = y / 2 - fontSize / 2; // center text vertically
-            if (winner === "r"){
-                p5.fill("red");
-            }else{
-                p5.fill("blue");
-            }
-            p5.noStroke();
-            p5.textSize(fontSize);
-            p5.textStyle(p5.BOLD);
-            p5.text(winText, winTextX, winTextY); // draw text
+            drawWinningText(xStart,yStart, circleRad, 30, winner, p5);
         }
         p5.noFill();
 
-        // draw field (stones, rows, columns)
-        for (let i = 0; i < field.length; i++) {
-            for (let j = 0; j < field[i].length; j++) {
-                if (field[i][j] === "r") {
-                    p5.fill("red");
-                }
-                else if (field[i][j] === "b"){
-                    p5.fill("blue");
-                }
-                p5.noStroke();
-                p5.circle(x, y, circleRad);
-                p5.noFill();
-                p5.stroke(0);
-                p5.rect(x-circleRad/2, y-circleRad/2, circleRad, circleRad);
-                x += xStep;
-            }
-            x = xStart;
-            y += yStep;
-        }
+        // draw stones and the grid
+        drawStones(field, xStart, yStart, circleRad, p5);
+        drawGrid(field, xStart, yStart, circleRad, p5);
     }
-
 
     return (
         <div id="gameBody">
