@@ -1,18 +1,18 @@
 {
   "files": {
-    "main.css": "/fourinarow/static/css/main.8834f094.chunk.css",
-    "main.js": "/fourinarow/static/js/main.1b03d4af.chunk.js",
-    "main.js.map": "/fourinarow/static/js/main.1b03d4af.chunk.js.map",
-    "runtime-main.js": "/fourinarow/static/js/runtime-main.417d5ba9.js",
-    "runtime-main.js.map": "/fourinarow/static/js/runtime-main.417d5ba9.js.map",
-    "static/js/2.edfb827c.chunk.js": "/fourinarow/static/js/2.edfb827c.chunk.js",
-    "static/js/2.edfb827c.chunk.js.map": "/fourinarow/static/js/2.edfb827c.chunk.js.map",
-    "index.html": "/fourinarow/index.html",
-    "static/css/main.8834f094.chunk.css.map": "/fourinarow/static/css/main.8834f094.chunk.css.map",
-    "static/js/2.edfb827c.chunk.js.LICENSE.txt": "/fourinarow/static/js/2.edfb827c.chunk.js.LICENSE.txt"
+    "main.css": "/FourInARow/static/css/main.8834f094.chunk.css",
+    "main.js": "/FourInARow/static/js/main.1b03d4af.chunk.js",
+    "main.js.map": "/FourInARow/static/js/main.1b03d4af.chunk.js.map",
+    "runtime-main.js": "/FourInARow/static/js/runtime-main.2c390737.js",
+    "runtime-main.js.map": "/FourInARow/static/js/runtime-main.2c390737.js.map",
+    "static/js/2.edfb827c.chunk.js": "/FourInARow/static/js/2.edfb827c.chunk.js",
+    "static/js/2.edfb827c.chunk.js.map": "/FourInARow/static/js/2.edfb827c.chunk.js.map",
+    "index.html": "/FourInARow/index.html",
+    "static/css/main.8834f094.chunk.css.map": "/FourInARow/static/css/main.8834f094.chunk.css.map",
+    "static/js/2.edfb827c.chunk.js.LICENSE.txt": "/FourInARow/static/js/2.edfb827c.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.417d5ba9.js",
+    "static/js/runtime-main.2c390737.js",
     "static/js/2.edfb827c.chunk.js",
     "static/css/main.8834f094.chunk.css",
     "static/js/main.1b03d4af.chunk.js"
